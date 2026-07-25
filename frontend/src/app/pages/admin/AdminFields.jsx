@@ -27,6 +27,81 @@ const AdminFields = () => {
   const [formData, setFormData] = useState({ name: "", description: "" });
   const [formSubmitLoading, setFormSubmitLoading] = useState(false);
 
+  const handleOpenAddModal = () => {
+    setEditingField(null);
+    setFormData({ name: "", description: "" });
+    setModalOpen(true);
+  };
+
+  const handleOpenEditModal = (field) => {
+    setEditingField(field);
+    setFormData({
+      name: field.name || field.field_name || "",
+      description: field.description || "",
+    });
+    setModalOpen(true);
+  };
+
+  const handleDelete = async (id, name) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete the field "${name}"? Problems and posts tagged with this field may lose their category.`,
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setError("");
+      setSuccess("");
+      await deleteAdminField(id);
+      setSuccess(`Field "${name}" deleted successfully.`);
+      setFields(fields.filter((f) => f.field_id !== id));
+    } catch (err) {
+      setError(err.message || "Failed to delete field");
+    }
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.name.trim() || !formData.description.trim()) {
+      setError("Name and description are required.");
+      return;
+    }
+
+    try {
+      setFormSubmitLoading(true);
+      setError("");
+      setSuccess("");
+
+      if (editingField) {
+        // Edit mode
+        await updateAdminField(editingField.field_id, formData);
+        setSuccess(`Field "${formData.name}" updated successfully.`);
+      } else {
+        // Create mode
+        await createAdminField(formData);
+        setSuccess(`Field "${formData.name}" created successfully.`);
+      }
+
+      setModalOpen(false);
+      fetchFields(); // Reload list
+    } catch (err) {
+      setError(err.message || "Failed to save field details");
+    } finally {
+      setFormSubmitLoading(false);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
   return (
     <div className="admin-fields-container">
       <div className="admin-fields-header">
@@ -123,7 +198,7 @@ const AdminFields = () => {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Quantum Computing, Molecular Dynamics"
+                  placeholder=""
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -137,7 +212,7 @@ const AdminFields = () => {
                 <textarea
                   required
                   rows="4"
-                  placeholder="Detailed description of what kind of research problems fall under this specific label..."
+                  placeholder=""
                   value={formData.description}
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })

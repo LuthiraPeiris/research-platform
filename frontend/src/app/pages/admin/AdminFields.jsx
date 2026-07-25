@@ -98,6 +98,84 @@ const AdminFields = () => {
           })}
         </div>
       )}
+
+      {modalOpen && (
+        <div className="admin-fields-overlay">
+          <div className="admin-fields-modal">
+            <div className="admin-fields-modal-header">
+              <h3 className="admin-fields-modal-title">
+                {editingField ? "Edit Field Details" : "Create New Field"}
+              </h3>
+              <button
+                onClick={() => setModalOpen(false)}
+                className="admin-fields-modal-close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={handleFormSubmit}
+              className="admin-fields-modal-form"
+            >
+              <div className="admin-fields-form-group">
+                <label className="admin-fields-label">Field Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Quantum Computing, Molecular Dynamics"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  className="admin-fields-input"
+                />
+              </div>
+
+              <div className="admin-fields-form-group">
+                <label className="admin-fields-label">Description</label>
+                <textarea
+                  required
+                  rows="4"
+                  placeholder="Detailed description of what kind of research problems fall under this specific label..."
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  className="admin-fields-textarea"
+                />
+              </div>
+
+              {editingField && (
+                <div className="admin-fields-warning">
+                  <AlertTriangle className="admin-fields-warning-icon" />
+                  <p className="admin-fields-warning-text">
+                    Editing a field will update its categorizations site-wide
+                    for all posts immediately.
+                  </p>
+                </div>
+              )}
+
+              <div className="admin-fields-modal-footer">
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(false)}
+                  className="admin-fields-btn-cancel"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={formSubmitLoading}
+                  className="admin-fields-btn-save"
+                >
+                  {formSubmitLoading ? "Saving..." : "Save Field"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

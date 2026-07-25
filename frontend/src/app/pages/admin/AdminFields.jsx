@@ -179,3 +179,5 @@ const AdminFields = () => {
     </div>
   );
 };
+
+export default AdminFields;

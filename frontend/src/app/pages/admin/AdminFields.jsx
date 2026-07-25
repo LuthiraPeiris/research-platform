@@ -42,6 +42,62 @@ const AdminFields = () => {
           <span>Add New Field</span>
         </button>
       </div>
+
+      {/* Grid Layout of Fields */}
+      {loading ? (
+        <div className="admin-fields-loading">Loading fields...</div>
+      ) : fields.length === 0 ? (
+        <div className="admin-fields-empty">
+          No research fields defined yet. Click "Add New Field" to create one.
+        </div>
+      ) : (
+        <div className="admin-fields-grid">
+          {fields.map((field) => {
+            const name = field.name || field.field_name;
+            return (
+              <div key={field.field_id} className="admin-fields-card">
+                <div>
+                  <div className="admin-fields-card-header">
+                    <div className="admin-fields-icon-wrapper">
+                      <Layers className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="admin-fields-card-title">{name}</h3>
+                      <span className="admin-fields-card-id">
+                        ID: #{field.field_id}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="admin-fields-card-desc">{field.description}</p>
+                </div>
+
+                <div className="admin-fields-card-footer">
+                  <div className="admin-fields-date">
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>{formatDate(field.created_at)}</span>
+                  </div>
+                  <div className="admin-fields-actions">
+                    <button
+                      onClick={() => handleOpenEditModal(field)}
+                      className="admin-fields-btn-edit"
+                      title="Edit Field"
+                    >
+                      <Edit2 className="w-4.5 h-4.5" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(field.field_id, name)}
+                      className="admin-fields-btn-delete"
+                      title="Delete Field"
+                    >
+                      <Trash2 className="w-4.5 h-4.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

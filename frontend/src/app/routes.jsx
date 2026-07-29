@@ -22,7 +22,14 @@ import { NotFound } from "./pages/NotFound";
 
 // Admin imports
 import AdminRoute from "./components/AdminRoute";
+import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminPosts from "./pages/admin/AdminPosts";
+import AdminComments from "./pages/admin/AdminComments";
+import AdminSolutions from "./pages/admin/AdminSolutions";
+import AdminArchive from "./pages/admin/AdminArchive";
+import AdminFields from "./pages/admin/AdminFields";
 
 export const router = createBrowserRouter([
   {
@@ -61,9 +68,18 @@ export const router = createBrowserRouter([
     path: "/admin",
     element: (
       <AdminRoute>
-        <AdminDashboard />
+        <AdminLayout />
       </AdminRoute>
     ),
+    children: [
+      { index: true, element: <AdminDashboard /> },
+      { path: "users", element: <AdminUsers /> },
+      { path: "posts", element: <AdminPosts /> },
+      { path: "comments", element: <AdminComments /> },
+      { path: "solutions", element: <AdminSolutions /> },
+      { path: "archive", element: <AdminArchive /> },
+      { path: "fields", element: <AdminFields /> },
+    ],
   },
 
   {

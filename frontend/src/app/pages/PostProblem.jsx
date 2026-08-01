@@ -14,6 +14,7 @@ import { AppAlert } from "../components/AppAlert";
 
 export function PostProblem() {
   const [files, setFiles] = useState([]);
+  const [isDraggingFiles, setIsDraggingFiles] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
   const [fields, setFields] = useState([]);
 
@@ -141,16 +142,43 @@ const validateFiles = (selectedFiles) => {
   return validFiles;
 };
 
+  const addFiles = (selectedFiles) => {
+    setError("");
+
+    const validFiles = validateFiles(Array.from(selectedFiles));
+    setFiles((currentFiles) => [...currentFiles, ...validFiles]);
+  };
+
   const handleFileChange = (e) => {
-  setError("");
+    addFiles(e.target.files);
+    e.target.value = "";
+  };
 
-  const selectedFiles = Array.from(e.target.files);
-  const validFiles = validateFiles(selectedFiles);
+  const handleFileDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = "copy";
+    setIsDraggingFiles(true);
+  };
 
-  setFiles([...files, ...validFiles]);
+  const handleFileDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-  e.target.value = "";
-};
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      setIsDraggingFiles(false);
+    }
+  };
+
+  const handleFileDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingFiles(false);
+
+    if (e.dataTransfer.files.length > 0) {
+      addFiles(e.dataTransfer.files);
+    }
+  };
 
   const removeFile = (index) => {
     setFiles(files.filter((_, i) => i !== index));
@@ -393,7 +421,17 @@ const validateFiles = (selectedFiles) => {
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <label className="mb-3 block text-sm font-medium text-slate-800 dark:text-slate-200">Attachments</label>
 
-          <label className="block cursor-pointer rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center transition-colors hover:border-blue-400 hover:bg-blue-50/30 dark:border-slate-700 dark:bg-slate-800/50 dark:hover:border-blue-700">
+          <label
+            onDragEnter={handleFileDragOver}
+            onDragOver={handleFileDragOver}
+            onDragLeave={handleFileDragLeave}
+            onDrop={handleFileDrop}
+            className={`block cursor-pointer rounded-lg border border-dashed p-6 text-center transition-colors ${
+              isDraggingFiles
+                ? "border-blue-500 bg-blue-50 ring-2 ring-blue-100 dark:border-blue-500 dark:bg-blue-950/30 dark:ring-blue-900/50"
+                : "border-slate-300 bg-slate-50 hover:border-blue-400 hover:bg-blue-50/30 dark:border-slate-700 dark:bg-slate-800/50 dark:hover:border-blue-700"
+            }`}
+          >
             <Upload className="mx-auto mb-3 h-8 w-8 text-slate-400 dark:text-slate-500" />
 
             <p className="mb-2 text-gray-900 dark:text-gray-100">

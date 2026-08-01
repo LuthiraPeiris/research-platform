@@ -5,7 +5,6 @@ import {
   Award,
   Calendar,
   MapPin,
-  Link as LinkIcon,
   Mail,
   Star,
   Trophy,
@@ -31,7 +30,7 @@ import {
 } from "../services/userService";
 
 export function UserProfile() {
-  const { username } = useParams();
+  const { userId } = useParams();
 
   const [activeTab, setActiveTab] = useState("activity");
   const [profile, setProfile] = useState(null);
@@ -56,21 +55,21 @@ export function UserProfile() {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const userId = username || currentUser?.user_id;
+        const profileUserId = userId || currentUser?.user_id;
 
-        if (!userId) {
+        if (!profileUserId) {
           setError("User not found. Please login again.");
           setLoading(false);
           return;
         }
 
         const [profileData, postsData, solutionsData, fieldsData] =
-          await Promise.all([
-            getUserProfile(userId),
-            getUserPosts(userId),
-            getUserSolutions(userId),
-            getUserFields(userId),
-          ]);
+        await Promise.all([
+          getUserProfile(profileUserId),
+          getUserPosts(profileUserId),
+          getUserSolutions(profileUserId),
+          getUserFields(profileUserId),
+        ]);
 
         const finalPosts = Array.isArray(postsData)
           ? postsData
@@ -102,7 +101,7 @@ export function UserProfile() {
     };
 
     fetchUserProfile();
-  }, [username, currentUser?.user_id]);
+  }, [userId, currentUser?.user_id]);
 
   const handleProfileImageChange = async (e) => {
     const file = e.target.files[0];
@@ -307,10 +306,8 @@ export function UserProfile() {
         </div>
 
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div className="h-24 border-b border-slate-200 bg-slate-100 dark:border-slate-800 dark:bg-slate-800" />
-
-          <div className="px-5 pb-6 sm:px-6">
-            <div className="-mt-12 mb-5 flex flex-col gap-4 sm:flex-row sm:items-end">
+          <div className="px-5 py-6 sm:px-6">
+            <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end">
               <div className="relative">
                 <img
                   src={avatar}
@@ -339,7 +336,7 @@ export function UserProfile() {
                       {profile.full_name}
                     </h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400">
-                      @{profile.email?.split("@")[0] || "researcher"}
+                      @collabsolver-{profile.user_id}
                     </p>
                   </div>
 
@@ -402,11 +399,11 @@ export function UserProfile() {
                   {editLoading ? "Saving..." : "Save Changes"}
                 </button>
               </div>
-            ) : (
+            ) : profile.bio ? (
               <p className="mb-4 max-w-3xl text-sm leading-6 text-slate-700 dark:text-slate-300">
-                {profile.bio || "No bio added yet."}
+                {profile.bio}
               </p>
-            )}
+            ) : null}
 
             <div className="mb-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
               <span className="flex items-center gap-2">
@@ -415,17 +412,12 @@ export function UserProfile() {
                   "Organization not added"}
               </span>
 
-              <span className="flex items-center gap-2">
-                <LinkIcon className="w-4 h-4" />
-                <a href="#" className="text-blue-600 hover:underline dark:text-blue-400">
-                  CollabSolve Profile
-                </a>
-              </span>
-
-              <span className="flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                {profile.email}
-              </span>
+              {currentUser?.user_id === profile.user_id && (
+                <span className="flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  {profile.email}
+                </span>
+              )}
 
               <span className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />

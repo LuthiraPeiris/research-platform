@@ -13,6 +13,14 @@ import {
 
 import { createNotificationIfAllowed } from "../utils/notificationUtils.js";
 
+const runReputationTask = async (task, context) => {
+  try {
+    await task();
+  } catch (error) {
+    console.error(`${context} reputation processing failed:`, error);
+  }
+};
+
 // ================= ADD SOLUTION =================
 
 export const addSolution = async (req, res) => {
@@ -143,13 +151,14 @@ export const addSolution = async (req, res) => {
       Number(req.user.user_id)
     ) {
       await createNotificationIfAllowed({
-        userId: post.user_id,
-        message: `A new solution was submitted for your problem: ${post.title}`,
-        type: "solution",
-        referenceId: solutionId,
-        referenceType: "solution",
-        connection,
-      });
+  userId: post.user_id,
+  actorUserId: req.user.user_id,
+  message: `A new solution was submitted for your problem: ${post.title}`,
+  type: "solution",
+  referenceId: solutionId,
+  referenceType: "solution",
+  connection,
+});
     }
 
     await connection.commit();
@@ -157,14 +166,18 @@ export const addSolution = async (req, res) => {
     /*
      * Reputation is handled after the main transaction.
      */
-    await addReputationEvent({
-      userId: req.user.user_id,
-      points: 3,
-      eventType: "submit_solution",
-      referenceType: "solution",
-      referenceId: solutionId,
-      description: "Submitted a solution",
-    });
+    await runReputationTask(
+      () =>
+        addReputationEvent({
+          userId: req.user.user_id,
+          points: 3,
+          eventType: "submit_solution",
+          referenceType: "solution",
+          referenceId: solutionId,
+          description: "Submitted a solution",
+        }),
+      "Submit solution",
+    );
 
     return res.status(201).json({
       message: "Solution submitted successfully",
@@ -447,25 +460,30 @@ export const verifySolution = async (req, res) => {
     );
 
     await createNotificationIfAllowed({
-      userId: solution.user_id,
-      message:
-        "Your solution was marked as solved by the problem owner.",
-      type: "verification",
-      referenceId: solutionId,
-      referenceType: "solution",
-      connection,
-    });
+  userId: solution.user_id,
+  actorUserId: req.user.user_id,
+  message:
+    "Your solution was marked as solved by the problem owner.",
+  type: "verification",
+  referenceId: solutionId,
+  referenceType: "solution",
+  connection,
+});
 
     await connection.commit();
 
-    await addReputationEvent({
-      userId: solution.user_id,
-      points: 10,
-      eventType: "verified_solution",
-      referenceType: "solution",
-      referenceId: solutionId,
-      description: "Solution was verified",
-    });
+    await runReputationTask(
+      () =>
+        addReputationEvent({
+          userId: solution.user_id,
+          points: 10,
+          eventType: "verified_solution",
+          referenceType: "solution",
+          referenceId: solutionId,
+          description: "Solution was verified",
+        }),
+      "Verify solution",
+    );
 
     return res.status(200).json({
       message:
@@ -810,19 +828,21 @@ export const toggleSolutionLike = async (
         solutionOwnerId &&
         Number(solutionOwnerId) !== Number(userId)
       ) {
-        await addReputationEvent({
-          userId: solutionOwnerId,
-          points: 1,
-          eventType: "solution_like_received",
-          referenceType: "solution_like",
-          referenceId:
-            Number(solutionId) * 1000000 +
-            Number(userId),
-          description:
-            "Solution received a like",
-        });
+        await runReputationTask(async () => {
+          await addReputationEvent({
+            userId: solutionOwnerId,
+            points: 1,
+            eventType: "solution_like_received",
+            referenceType: "solution_like",
+            referenceId:
+              Number(solutionId) * 1000000 +
+              Number(userId),
+            description:
+              "Solution received a like",
+          });
 
-        await checkPopularSolutionBadge(solutionId);
+          await checkPopularSolutionBadge(solutionId);
+        }, "Like solution");
       }
     }
 

@@ -62,7 +62,7 @@ export const router = createBrowserRouter([
       { path: "saved-problems", Component: SavedProblems },
       { path: "notifications", Component: NotificationsPage },
       { path: "settings", Component: SettingsPage },
-      { path: "profile/:username", Component: UserProfile },
+      { path: "profile/:userId", Component: UserProfile },
       { path: "leaderboard", Component: Leaderboard },
       { path: "archive", Component: KnowledgeArchive },
     ],

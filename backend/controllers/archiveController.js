@@ -28,6 +28,7 @@ export const getAllArchiveItems = async (req, res) => {
 
         f.field_name,
 
+        post_user.user_id AS post_author_id,
         post_user.full_name AS post_author,
         post_user.profile_picture AS post_author_picture,
 
@@ -35,6 +36,7 @@ export const getAllArchiveItems = async (req, res) => {
         s.solution_text,
         s.verified_at,
 
+        solution_user.user_id AS solution_author_id,
         solution_user.full_name AS solution_author,
         solution_user.profile_picture AS solution_author_picture,
 
@@ -151,6 +153,7 @@ export const getArchiveItemById = async (req, res) => {
 
         f.field_name,
 
+        post_user.user_id AS post_author_id,
         post_user.full_name AS post_author,
         post_user.profile_picture AS post_author_picture,
 
@@ -158,6 +161,7 @@ export const getArchiveItemById = async (req, res) => {
         s.solution_text,
         s.verified_at,
 
+        solution_user.user_id AS solution_author_id,
         solution_user.full_name AS solution_author,
         solution_user.profile_picture AS solution_author_picture,
 

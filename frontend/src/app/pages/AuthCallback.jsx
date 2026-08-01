@@ -1,0 +1,63 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+
+export function AuthCallback() {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [status, setStatus] = useState("Authenticating with Google...");
+
+  useEffect(() => {
+    const code = searchParams.get("code");
+    const state = searchParams.get("state"); // Expecting "google"
+
+    if (!code || state !== "google") {
+      setStatus("Authentication code or invalid state configuration.");
+      setTimeout(() => navigate("/login"), 3000);
+      return;
+    }
+
+    const exchangeCode = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/auth/google", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ code }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Google OAuth exchange failed");
+        }
+
+        // Store JWT token and user info in LocalStorage
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        setStatus("Google Login successful! Redirecting...");
+
+        // Redirect to main application dashboard
+        setTimeout(() => navigate("/app"), 1500);
+      } catch (err) {
+        console.error(err);
+        setStatus(`Authentication failed: ${err.message}`);
+        setTimeout(() => navigate("/login"), 4000);
+      }
+    };
+
+    exchangeCode();
+  }, [searchParams, navigate]);
+
+  return (
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center text-slate-800">
+      <div className="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 flex flex-col items-center max-w-sm w-full text-center">
+        {/* Loading Spinner */}
+        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
+        <h2 className="text-xl font-bold text-slate-900 mb-2">Google Login</h2>
+        <p className="text-slate-600">{status}</p>
+      </div>
+    </div>
+  );
+}

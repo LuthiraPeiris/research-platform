@@ -3,6 +3,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { LandingPage } from "./pages/LandingPage";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
+import { AuthCallback } from "./pages/AuthCallback";
 
 import { DashboardLayout } from "./layouts/DashboardLayout";
 import { Dashboard } from "./pages/Dashboard";
@@ -43,6 +44,10 @@ export const router = createBrowserRouter([
   {
     path: "/register",
     Component: RegisterPage,
+  },
+  {
+    path: "/auth-callback",
+    Component: AuthCallback,
   },
   {
     path: "/app",

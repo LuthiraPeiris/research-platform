@@ -24,6 +24,21 @@ const AdminPosts = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        setPosts(await getAdminPosts());
+      } catch (err) {
+        setError(err.message || "Failed to load posts");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
   const handleDelete = async (id, title) => {
     if (
       !window.confirm(

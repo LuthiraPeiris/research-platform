@@ -1,6 +1,13 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from "url";
+
+const backendDirectory = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "..",
+);
+const uploadsDirectory = path.join(backendDirectory, "uploads");
 
 const ensureFolderExists = (folderPath) => {
   if (!fs.existsSync(folderPath)) {
@@ -10,10 +17,10 @@ const ensureFolderExists = (folderPath) => {
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    let folder = "uploads";
+    let folder = uploadsDirectory;
 
     if (req.baseUrl.includes("solutions") || req.originalUrl.includes("solutions")) {
-      folder = "uploads/solutions";
+      folder = path.join(uploadsDirectory, "solutions");
     }
 
     ensureFolderExists(folder);

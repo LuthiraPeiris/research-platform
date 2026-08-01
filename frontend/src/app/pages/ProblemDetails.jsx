@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AppAlert } from "../components/AppAlert";
+import { API_ORIGIN } from "../services/api";
 import {
   ThumbsUp,
   MessageSquare,
@@ -483,7 +484,7 @@ const handleSharePost = async () => {
       return filePath;
     }
 
-    return `http://localhost:5000${filePath}`;
+    return `${API_ORIGIN}${filePath}`;
   };
 
   const getFileSizeText = (attachment) => {
@@ -585,7 +586,7 @@ const nestedComments = buildCommentTree(comments);
     }
 
     if (imagePath.startsWith("/uploads")) {
-      return `http://localhost:5000${imagePath}`;
+      return `${API_ORIGIN}${imagePath}`;
     }
 
     return imagePath;

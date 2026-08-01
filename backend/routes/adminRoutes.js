@@ -40,7 +40,7 @@ router.delete("/comments/:id", deleteComment);
 
 //---------------------solutions----------------
 router.get("/solutions", getAllSolutions);
-router.delete("/soutions/:id", deleteSolution);
+router.delete("/solutions/:id", deleteSolution);
 
 //---------------------Fields--------------------
 router.get("/fields", getAllFields);

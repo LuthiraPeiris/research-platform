@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from "react";
 import { getArchiveItems } from "../services/archiveService";
 import { AppAlert } from "../components/AppAlert";
+import { API_ORIGIN } from "../services/api";
 
 export function KnowledgeArchive() {
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -86,7 +87,7 @@ export function KnowledgeArchive() {
       return filePath;
     }
 
-    return `http://localhost:5000${filePath}`;
+    return `${API_ORIGIN}${filePath}`;
   };
 
   const filteredArchiveItems = archiveItems.filter((item) => {

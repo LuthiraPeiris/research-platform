@@ -27,6 +27,21 @@ const AdminFields = () => {
   const [formData, setFormData] = useState({ name: "", description: "" });
   const [formSubmitLoading, setFormSubmitLoading] = useState(false);
 
+  const fetchFields = async () => {
+    try {
+      setLoading(true);
+      setFields(await getAdminFields());
+    } catch (err) {
+      setError(err.message || "Failed to load fields");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchFields();
+  }, []);
+
   const handleOpenAddModal = () => {
     setEditingField(null);
     setFormData({ name: "", description: "" });

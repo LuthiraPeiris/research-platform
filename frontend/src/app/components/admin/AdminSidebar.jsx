@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Users,
   PanelLeftClose,
+  PanelLeftOpen,
   Home,
   LogOut,
 } from "lucide-react";

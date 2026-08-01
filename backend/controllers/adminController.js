@@ -6,7 +6,7 @@ import { createNotificationIfAllowed } from "../utils/notificationUtils.js";
 const getAllUsers = async (req, res) => {
   try {
     const [users] = await db.query(
-      "SELECT user_id, name, email, role, created_at FROM users ORDER BY created_at DESC",
+      "SELECT user_id, full_name, full_name AS name, email, role, created_at FROM users ORDER BY created_at DESC",
     );
 
     res.json({ users });
@@ -45,8 +45,8 @@ const getAllPosts = async (req, res) => {
         p.status,
         p.is_archived,
         p.created_at,
-        u.name AS author_name,
-        f.name AS field_name
+        u.full_name AS author_name,
+        f.field_name
         FROM posts p
         LEFT JOIN users u ON p.user_id = u.user_id
         LEFT JOIN fields f ON p.field_id = f.field_id
@@ -95,9 +95,9 @@ const getAllComments = async (req, res) => {
     const [comments] = await db.query(`
        SELECT 
         c.comment_id,
-        c.content,
+        c.comment_text AS content,
         c.created_at,
-        u.name AS author_name,
+        u.full_name AS author_name,
         p.title AS post_title
       FROM comments c
       LEFT JOIN users u ON c.user_id = u.user_id
@@ -133,13 +133,13 @@ const getAllSolutions = async (req, res) => {
     const [solutions] = await db.query(`
       SELECT 
        s.solution_id,
-        s.content,
+        s.solution_text AS content,
         s.created_at,
-        u.name AS author_name,
+        u.full_name AS author_name,
         p.title AS post_title
       FROM solutions s 
       LEFT JOIN users u ON s.user_id = u.user_id
-      LEFT JOIN users p ON s.post_id = p.post_id
+      LEFT JOIN posts p ON s.post_id = p.post_id
       ORDER BY s.created_at DESC
       `);
 
@@ -169,7 +169,7 @@ const deleteSolution = async (req, res) => {
 const getAllFields = async (req, res) => {
   try {
     const [fields] = await db.query(
-      "SELECT * FROM fields ORDER BY created_at DESC",
+      "SELECT * FROM fields ORDER BY field_name ASC",
     );
 
     res.json({ fields });
@@ -185,7 +185,7 @@ const createField = async (req, res) => {
   try {
     const { name, description } = req.body;
 
-    await db.query("INSERT INTO fields (name, description) VALUES (?, ?)", [
+    await db.query("INSERT INTO fields (field_name, description) VALUES (?, ?)", [
       name,
       description,
     ]);
@@ -205,7 +205,7 @@ const updateField = async (req, res) => {
     const { name, description } = req.body;
 
     await db.query(
-      "UPDATE fields SET name = ?, description = ? WHERE field_id = ?",
+      "UPDATE fields SET field_name = ?, description = ? WHERE field_id = ?",
       [name, description, id],
     );
 
@@ -239,8 +239,8 @@ const getArchive = async (req, res) => {
         p.title,
         p.description,
         p.created_at,
-        u.name AS author_name,
-        f.name AS field_name
+        u.full_name AS author_name,
+        f.field_name
       FROM posts p
       LEFT JOIN users u ON p.user_id = u.user_id
       LEFT JOIN fields f ON p.field_id = f.field_id

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import API_BASE_URL from "../services/api";
 
 export function AuthCallback() {
   const [searchParams] = useSearchParams();
@@ -18,7 +19,7 @@ export function AuthCallback() {
 
     const exchangeCode = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/auth/google", {
+        const response = await fetch(`${API_BASE_URL}/auth/google`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

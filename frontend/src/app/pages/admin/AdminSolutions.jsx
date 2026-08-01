@@ -20,6 +20,21 @@ const AdminSolutions = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  useEffect(() => {
+    const fetchSolutions = async () => {
+      try {
+        setLoading(true);
+        setSolutions(await getAdminSolutions());
+      } catch (err) {
+        setError(err.message || "Failed to load solutions");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSolutions();
+  }, []);
+
   const handleDelete = async (id, author) => {
     if (
       !window.confirm(

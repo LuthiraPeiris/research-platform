@@ -19,6 +19,25 @@ import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
 
+// Run database schema updates inline
+(async () => {
+  try {
+    const [cols] = await db.query("SHOW COLUMNS FROM users LIKE 'google_id'");
+    if (cols.length === 0) {
+      console.log("google_id column missing. Modifying users table inline...");
+      await db.query(
+        "ALTER TABLE users MODIFY COLUMN password_hash VARCHAR(255) NULL",
+      );
+      await db.query(
+        "ALTER TABLE users ADD COLUMN google_id VARCHAR(255) UNIQUE DEFAULT NULL",
+      );
+      console.log("Database schema successfully updated with google_id.");
+    }
+  } catch (err) {
+    console.error("Database migration check failed:", err.message);
+  }
+})();
+
 const app = express();
 
 app.use(cors());

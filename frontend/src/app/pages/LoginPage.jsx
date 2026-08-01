@@ -37,6 +37,29 @@ export function LoginPage() {
       setLoading(false);
     }
   };
+  const handleGoogleLogin = () => {
+    const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth";
+    const clientId =
+      import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID";
+    const redirectUri =
+      import.meta.env.VITE_GOOGLE_REDIRECT_URI ||
+      "http://localhost:5173/auth-callback";
+    const options = {
+      redirect_uri: redirectUri,
+      client_id: clientId,
+      access_type: "offline",
+      response_type: "code",
+      prompt: "consent",
+      scope: [
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/userinfo.email",
+      ].join(" "),
+      state: "google",
+    };
+
+    const queryString = new URLSearchParams(options).toString();
+    window.location.href = `${rootUrl}?${queryString}`;
+  };
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[#eef6ff] via-[#f8fbff] to-[#f3efff] text-slate-900 flex items-center justify-center px-6 py-12">
@@ -83,7 +106,11 @@ export function LoginPage() {
 
           <div className="relative rounded-[2rem] border border-white bg-white/85 backdrop-blur-xl p-8 shadow-2xl shadow-slate-900/10">
             <div className="space-y-3 mb-5">
-              <AppAlert type="error" message={error} onClose={() => setError("")} />
+              <AppAlert
+                type="error"
+                message={error}
+                onClose={() => setError("")}
+              />
             </div>
 
             <form className="space-y-5" onSubmit={handleLogin}>
@@ -163,8 +190,12 @@ export function LoginPage() {
                 GitHub
               </button>
 
-              <button className="flex items-center justify-center gap-2 py-3.5 rounded-xl border border-slate-200 bg-white/80 hover:bg-slate-50 hover:border-slate-300 transition-all text-slate-700 font-medium shadow-sm">
-                <FaGoogle className="w-5 h-5" />
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                className="flex items-center justify-center gap-2 py-3.5 rounded-xl border border-slate-200 bg-white/80 hover:bg-slate-50 hover:border-slate-300 transition-all text-slate-700 font-medium shadow-sm cursor-pointer"
+              >
+                <FaGoogle className="w-5 h-5 text-red-500" />
                 Google
               </button>
             </div>

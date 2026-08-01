@@ -139,7 +139,6 @@ setNotifications(notificationList);
 
   const handleSearchChange = (event) => {
   const value = event.target.value;
-
   setSearchText(value);
 
   const trimmedValue = value.trim().toLowerCase();
@@ -147,6 +146,16 @@ setNotifications(notificationList);
   if (!trimmedValue) {
     setSearchSuggestions([]);
     setShowSearchSuggestions(false);
+
+    const params = new URLSearchParams(searchParams);
+    params.delete("search");
+
+    const queryString = params.toString();
+
+    navigate(queryString ? `/app?${queryString}` : "/app", {
+      replace: true,
+    });
+
     return;
   }
 

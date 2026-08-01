@@ -1,4 +1,13 @@
 import db from "../config/db.js";
+import { createSignedFileUrl } from "../services/s3Service.js";
+
+const addSignedAttachmentUrls = async (attachments) =>
+  Promise.all(
+    attachments.map(async (attachment) => ({
+      ...attachment,
+      file_path: await createSignedFileUrl(attachment.s3_key, 3600),
+    }))
+  );
 
 export const getAllArchiveItems = async (req, res) => {
   try {
@@ -59,19 +68,24 @@ export const getAllArchiveItems = async (req, res) => {
 
     const [postAttachments] = await db.query(
   `
-  SELECT 
+  SELECT
     attachment_id,
     post_id,
-    file_name,
-    file_path,
-    file_type,
-    uploaded_at
+    original_name AS file_name,
+    s3_key,
+    mime_type AS file_type,
+    file_size,
+    created_at AS uploaded_at
   FROM post_attachments
   WHERE post_id IN (?)
   ORDER BY uploaded_at DESC
   `,
   [postIds]
 );
+
+    const postAttachmentsWithUrls = await addSignedAttachmentUrls(
+      postAttachments
+    );
 
     let solutionAttachments = [];
 
@@ -81,9 +95,10 @@ export const getAllArchiveItems = async (req, res) => {
         SELECT 
           attachment_id,
           solution_id,
-          file_name,
-          file_path,
-          file_type,
+          original_name AS file_name,
+          s3_key,
+          mime_type AS file_type,
+          file_size,
           created_at
         FROM solution_attachments
         WHERE solution_id IN (?)
@@ -92,13 +107,13 @@ export const getAllArchiveItems = async (req, res) => {
         [solutionIds]
       );
 
-      solutionAttachments = attachments;
+      solutionAttachments = await addSignedAttachmentUrls(attachments);
     }
 
     const finalArchiveItems = archiveItems.map((item) => ({
       ...item,
       solution_like_count: Number(item.solution_like_count || 0),
-      post_attachments: postAttachments.filter(
+      post_attachments: postAttachmentsWithUrls.filter(
         (attachment) => attachment.post_id === item.post_id
       ),
       solution_attachments: solutionAttachments.filter(
@@ -176,19 +191,24 @@ export const getArchiveItemById = async (req, res) => {
 
     const [postAttachments] = await db.query(
   `
-  SELECT 
+  SELECT
     attachment_id,
     post_id,
-    file_name,
-    file_path,
-    file_type,
-    uploaded_at
+    original_name AS file_name,
+    s3_key,
+    mime_type AS file_type,
+    file_size,
+    created_at AS uploaded_at
   FROM post_attachments
   WHERE post_id = ?
   ORDER BY uploaded_at DESC
   `,
   [archiveItem.post_id]
 );
+
+    const postAttachmentsWithUrls = await addSignedAttachmentUrls(
+      postAttachments
+    );
 
     let solutionAttachments = [];
 
@@ -198,9 +218,10 @@ export const getArchiveItemById = async (req, res) => {
         SELECT 
           attachment_id,
           solution_id,
-          file_name,
-          file_path,
-          file_type,
+          original_name AS file_name,
+          s3_key,
+          mime_type AS file_type,
+          file_size,
           created_at
         FROM solution_attachments
         WHERE solution_id = ?
@@ -209,13 +230,13 @@ export const getArchiveItemById = async (req, res) => {
         [archiveItem.solution_id]
       );
 
-      solutionAttachments = attachments;
+      solutionAttachments = await addSignedAttachmentUrls(attachments);
     }
 
     res.status(200).json({
       ...archiveItem,
       solution_like_count: Number(archiveItem.solution_like_count || 0),
-      post_attachments: postAttachments,
+      post_attachments: postAttachmentsWithUrls,
       solution_attachments: solutionAttachments,
     });
   } catch (error) {

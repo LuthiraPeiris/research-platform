@@ -1,4 +1,8 @@
 import db from "../config/db.js";
+import {
+  deleteFileFromS3,
+  uploadFileToS3,
+} from "../services/s3Service.js";
 
 export const getUserProfile = async (req, res) => {
   try {
@@ -149,6 +153,8 @@ export const getUserPosts = async (req, res) => {
 };
 
 export const updateProfilePicture = async (req, res) => {
+  let uploadedS3Key = null;
+
   try {
     const { userId } = req.params;
 
@@ -164,18 +170,48 @@ export const updateProfilePicture = async (req, res) => {
       });
     }
 
-    const imagePath = `/uploads/${req.file.filename}`;
+    const [users] = await db.query(
+      "SELECT profile_picture FROM users WHERE user_id = ?",
+      [userId]
+    );
+
+    if (users.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const uploadedFile = await uploadFileToS3(
+      req.file,
+      "profile-pictures"
+    );
+    uploadedS3Key = uploadedFile.key;
+
+    // Preserve the existing /uploads URL contract used throughout the UI.
+    const imagePath = `/uploads/s3/${uploadedS3Key}`;
 
     await db.query(
       "UPDATE users SET profile_picture = ? WHERE user_id = ?",
       [imagePath, userId]
     );
 
+    const previousImagePath = users[0].profile_picture;
+    const s3PathPrefix = "/uploads/s3/";
+
+    if (previousImagePath?.startsWith(s3PathPrefix)) {
+      const previousS3Key = previousImagePath.slice(s3PathPrefix.length);
+      deleteFileFromS3(previousS3Key).catch((error) => {
+        console.error("Failed to delete previous profile picture:", error);
+      });
+    }
+
     res.status(200).json({
       message: "Profile picture updated successfully",
       profile_picture: imagePath,
     });
   } catch (error) {
+    if (uploadedS3Key) {
+      await deleteFileFromS3(uploadedS3Key).catch(() => {});
+    }
+
     res.status(500).json({
       message: "Failed to update profile picture",
       error: error.message,

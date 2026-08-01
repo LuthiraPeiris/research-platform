@@ -96,7 +96,7 @@ CREATE TABLE `comments` (
   CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
   CONSTRAINT `comments_ibfk_3` FOREIGN KEY (`parent_comment_id`) REFERENCES `comments` (`comment_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_parent_comment` FOREIGN KEY (`parent_comment_id`) REFERENCES `comments` (`comment_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -105,7 +105,7 @@ CREATE TABLE `comments` (
 
 LOCK TABLES `comments` WRITE;
 /*!40000 ALTER TABLE `comments` DISABLE KEYS */;
-INSERT INTO `comments` VALUES (2,4,6,NULL,'I like to know more about this.','2026-06-06 07:15:04','2026-06-06 07:15:04'),(3,3,7,NULL,'Hey how are you buddy??','2026-06-06 16:48:18','2026-06-06 16:48:18'),(4,3,7,3,'I was talking about the mess. do not think about it that much','2026-06-06 16:48:47','2026-06-06 16:48:47'),(5,7,5,NULL,'def validate_composition(expression, defined_functions):\n    # BUG: Only checks the first function name found, not all of them\n    for func in defined_functions:\n        if func in expression:\n            return True\n    return False','2026-08-01 11:20:27','2026-08-01 11:20:27'),(6,7,5,NULL,'I have a thought like this. but it is still processing.','2026-08-01 20:03:58','2026-08-01 20:03:58');
+INSERT INTO `comments` VALUES (2,4,6,NULL,'I like to know more about this.','2026-06-06 07:15:04','2026-06-06 07:15:04'),(3,3,7,NULL,'Hey how are you buddy??','2026-06-06 16:48:18','2026-06-06 16:48:18'),(4,3,7,3,'I was talking about the mess. do not think about it that much','2026-06-06 16:48:47','2026-06-06 16:48:47'),(5,7,5,NULL,'def validate_composition(expression, defined_functions):\n    # BUG: Only checks the first function name found, not all of them\n    for func in defined_functions:\n        if func in expression:\n            return True\n    return False','2026-08-01 11:20:27','2026-08-01 11:20:27'),(7,7,5,NULL,'i have a thought','2026-08-01 20:58:21','2026-08-01 20:58:21');
 /*!40000 ALTER TABLE `comments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -184,7 +184,7 @@ CREATE TABLE `notification_preferences` (
   PRIMARY KEY (`preference_id`),
   UNIQUE KEY `user_id` (`user_id`),
   CONSTRAINT `notification_preferences_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=95 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=99 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -219,7 +219,7 @@ CREATE TABLE `notifications` (
   KEY `fk_notifications_actor` (`actor_user_id`),
   CONSTRAINT `fk_notifications_actor` FOREIGN KEY (`actor_user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL,
   CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -228,7 +228,7 @@ CREATE TABLE `notifications` (
 
 LOCK TABLES `notifications` WRITE;
 /*!40000 ALTER TABLE `notifications` DISABLE KEYS */;
-INSERT INTO `notifications` VALUES (4,3,NULL,'A new solution was submitted for your problem: Software testing issue in React app','solution',1,4,'solution','2026-06-06 12:05:21'),(7,3,NULL,'Your solution was marked as solved by the problem owner.','verification',1,5,'solution','2026-06-06 13:41:43'),(8,3,NULL,'A new solution was submitted for your problem: Software Engineering is getting replaced by the AI.','solution',1,6,'solution','2026-06-06 19:12:43'),(10,3,NULL,'A new solution was submitted for your problem: Software Engineering is getting replaced by the AI.','solution',1,7,'solution','2026-06-06 19:58:26'),(11,3,NULL,'A new solution was submitted for your problem: Software Engineering is getting replaced by the AI.','solution',1,8,'solution','2026-06-07 08:07:22'),(13,9,NULL,'A new comment was added to your post: Function Composition Validator','comment',1,5,'comment','2026-08-01 11:20:27'),(14,9,NULL,'A new solution was submitted for your problem: Function Composition Validator','solution',1,10,'solution','2026-08-01 11:25:57'),(15,9,5,'A new comment was added to your post: Function Composition Validator','comment',1,6,'comment','2026-08-01 20:03:58');
+INSERT INTO `notifications` VALUES (4,3,NULL,'A new solution was submitted for your problem: Software testing issue in React app','solution',1,4,'solution','2026-06-06 12:05:21'),(7,3,NULL,'Your solution was marked as solved by the problem owner.','verification',1,5,'solution','2026-06-06 13:41:43'),(8,3,NULL,'A new solution was submitted for your problem: Software Engineering is getting replaced by the AI.','solution',1,6,'solution','2026-06-06 19:12:43'),(10,3,NULL,'A new solution was submitted for your problem: Software Engineering is getting replaced by the AI.','solution',1,7,'solution','2026-06-06 19:58:26'),(11,3,NULL,'A new solution was submitted for your problem: Software Engineering is getting replaced by the AI.','solution',1,8,'solution','2026-06-07 08:07:22'),(13,9,NULL,'A new comment was added to your post: Function Composition Validator','comment',1,5,'comment','2026-08-01 11:20:27'),(14,9,NULL,'A new solution was submitted for your problem: Function Composition Validator','solution',1,10,'solution','2026-08-01 11:25:57'),(15,9,5,'A new comment was added to your post: Function Composition Validator','comment',1,6,'comment','2026-08-01 20:03:58'),(16,9,5,'A new solution was submitted for your problem: Function Composition Validator','solution',0,11,'solution','2026-08-01 20:43:59'),(17,9,5,'A new solution was submitted for your problem: Function Composition Validator','solution',0,12,'solution','2026-08-01 20:50:35'),(18,9,5,'A new comment was added to your post: Function Composition Validator','comment',0,7,'comment','2026-08-01 20:58:21'),(19,9,5,'A new solution was submitted for your problem: Function Composition Validator','solution',0,13,'solution','2026-08-01 21:03:22');
 /*!40000 ALTER TABLE `notifications` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -316,7 +316,7 @@ CREATE TABLE `reputation` (
   PRIMARY KEY (`reputation_id`),
   UNIQUE KEY `user_id` (`user_id`),
   CONSTRAINT `reputation_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -325,7 +325,7 @@ CREATE TABLE `reputation` (
 
 LOCK TABLES `reputation` WRITE;
 /*!40000 ALTER TABLE `reputation` DISABLE KEYS */;
-INSERT INTO `reputation` VALUES (3,3,10,'Beginner','2026-06-06 13:41:43'),(4,4,0,'Beginner','2026-06-06 04:08:55'),(5,5,13,'Beginner','2026-08-01 20:03:58'),(6,6,10,'Beginner','2026-06-06 07:59:27'),(7,7,10,'Beginner','2026-06-06 12:06:19'),(11,8,17,'Beginner','2026-06-06 19:58:26'),(18,9,0,'Beginner','2026-08-01 11:13:07'),(22,10,0,'Beginner','2026-08-01 17:09:36');
+INSERT INTO `reputation` VALUES (3,3,10,'Beginner','2026-06-06 13:41:43'),(4,4,0,'Beginner','2026-06-06 04:08:55'),(5,5,23,'Beginner','2026-08-01 21:03:22'),(6,6,10,'Beginner','2026-06-06 07:59:27'),(7,7,10,'Beginner','2026-06-06 12:06:19'),(11,8,17,'Beginner','2026-06-06 19:58:26'),(18,9,0,'Beginner','2026-08-01 11:13:07'),(22,10,0,'Beginner','2026-08-01 17:09:36');
 /*!40000 ALTER TABLE `reputation` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -348,7 +348,7 @@ CREATE TABLE `reputation_events` (
   PRIMARY KEY (`event_id`),
   UNIQUE KEY `unique_reputation_event` (`user_id`,`event_type`,`reference_type`,`reference_id`),
   CONSTRAINT `reputation_events_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -357,7 +357,7 @@ CREATE TABLE `reputation_events` (
 
 LOCK TABLES `reputation_events` WRITE;
 /*!40000 ALTER TABLE `reputation_events` DISABLE KEYS */;
-INSERT INTO `reputation_events` VALUES (1,8,3,'submit_solution','solution',6,'Submitted a solution','2026-06-06 19:12:43'),(2,8,10,'verified_solution','solution',6,'Solution was verified','2026-06-06 19:13:15'),(3,8,1,'solution_like_received','solution_like',6000003,'Solution received a like','2026-06-06 19:13:18'),(4,8,3,'submit_solution','solution',7,'Submitted a solution','2026-06-06 19:58:26'),(5,5,3,'submit_solution','solution',8,'Submitted a solution','2026-06-07 08:07:22'),(6,5,3,'submit_solution','solution',9,'Submitted a solution','2026-06-07 08:10:02'),(7,5,1,'post_comment','comment',5,'Posted a comment','2026-08-01 11:20:27'),(8,5,2,'comment_like_received','comment_like',5000009,'Comment received a like','2026-08-01 11:21:11'),(9,5,3,'submit_solution','solution',10,'Submitted a solution','2026-08-01 11:25:57'),(10,5,1,'post_comment','comment',6,'Posted a comment','2026-08-01 20:03:58');
+INSERT INTO `reputation_events` VALUES (1,8,3,'submit_solution','solution',6,'Submitted a solution','2026-06-06 19:12:43'),(2,8,10,'verified_solution','solution',6,'Solution was verified','2026-06-06 19:13:15'),(3,8,1,'solution_like_received','solution_like',6000003,'Solution received a like','2026-06-06 19:13:18'),(4,8,3,'submit_solution','solution',7,'Submitted a solution','2026-06-06 19:58:26'),(5,5,3,'submit_solution','solution',8,'Submitted a solution','2026-06-07 08:07:22'),(6,5,3,'submit_solution','solution',9,'Submitted a solution','2026-06-07 08:10:02'),(7,5,1,'post_comment','comment',5,'Posted a comment','2026-08-01 11:20:27'),(8,5,2,'comment_like_received','comment_like',5000009,'Comment received a like','2026-08-01 11:21:11'),(9,5,3,'submit_solution','solution',10,'Submitted a solution','2026-08-01 11:25:57'),(10,5,1,'post_comment','comment',6,'Posted a comment','2026-08-01 20:03:58'),(11,5,3,'submit_solution','solution',11,'Submitted a solution','2026-08-01 20:43:59'),(12,5,3,'submit_solution','solution',12,'Submitted a solution','2026-08-01 20:50:35'),(13,5,1,'post_comment','comment',7,'Posted a comment','2026-08-01 20:58:21'),(14,5,3,'submit_solution','solution',13,'Submitted a solution','2026-08-01 21:03:22');
 /*!40000 ALTER TABLE `reputation_events` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -475,7 +475,7 @@ CREATE TABLE `solutions` (
   CONSTRAINT `solutions_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `posts` (`post_id`) ON DELETE CASCADE,
   CONSTRAINT `solutions_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
   CONSTRAINT `solutions_ibfk_3` FOREIGN KEY (`selected_by_user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -484,7 +484,7 @@ CREATE TABLE `solutions` (
 
 LOCK TABLES `solutions` WRITE;
 /*!40000 ALTER TABLE `solutions` DISABLE KEYS */;
-INSERT INTO `solutions` VALUES (2,4,6,'I have given the most suitable answer to this. like i have to know more about this research and the market gap of the world.',1,7,'2026-06-06 07:59:27','2026-06-06 07:15:38',0),(3,3,7,'This is the solution that i found in the post.',0,NULL,NULL,'2026-06-06 08:23:44',0),(4,2,7,'This is the solution to this',1,3,'2026-06-06 12:06:19','2026-06-06 12:05:21',0),(5,3,3,'This is Luthira\'s solution. is this right?',1,6,'2026-06-06 13:41:43','2026-06-06 13:40:07',0),(7,5,8,'I like to do this first. this is the second solution from Jayasara That is about to publish.',0,NULL,NULL,'2026-06-06 19:58:26',0),(9,5,5,'This is the solution by Avihska. TAke this and that',0,NULL,NULL,'2026-06-07 08:10:01',0),(10,7,5,'def tokenize(source_code):\r\n    import re\r\n    \r\n    # Pattern: identifiers, numbers, operators, parentheses, and braces\r\n    pattern = r\'([a-zA-Z_][a-zA-Z0-9_]*|\\d+|[+\\-*/=<>!]+|[(){}])\'\r\n    \r\n    tokens = re.findall(pattern, source_code)\r\n    \r\n    # Remove whitespace-only tokens (they aren\'t captured anyway)\r\n    return tokens',0,NULL,NULL,'2026-08-01 11:25:57',0);
+INSERT INTO `solutions` VALUES (2,4,6,'I have given the most suitable answer to this. like i have to know more about this research and the market gap of the world.',1,7,'2026-06-06 07:59:27','2026-06-06 07:15:38',0),(3,3,7,'This is the solution that i found in the post.',0,NULL,NULL,'2026-06-06 08:23:44',0),(4,2,7,'This is the solution to this',1,3,'2026-06-06 12:06:19','2026-06-06 12:05:21',0),(5,3,3,'This is Luthira\'s solution. is this right?',1,6,'2026-06-06 13:41:43','2026-06-06 13:40:07',0),(7,5,8,'I like to do this first. this is the second solution from Jayasara That is about to publish.',0,NULL,NULL,'2026-06-06 19:58:26',0),(9,5,5,'This is the solution by Avihska. TAke this and that',0,NULL,NULL,'2026-06-07 08:10:01',0),(10,7,5,'def tokenize(source_code):\r\n    import re\r\n    \r\n    # Pattern: identifiers, numbers, operators, parentheses, and braces\r\n    pattern = r\'([a-zA-Z_][a-zA-Z0-9_]*|\\d+|[+\\-*/=<>!]+|[(){}])\'\r\n    \r\n    tokens = re.findall(pattern, source_code)\r\n    \r\n    # Remove whitespace-only tokens (they aren\'t captured anyway)\r\n    return tokens',0,NULL,NULL,'2026-08-01 11:25:57',0),(13,7,5,'def validate_composition(expr, funcs):\r\n    return all(t in funcs or t in [\'x\', \'\'] for t in \'\'.join(c for c in expr if c.isalpha()).split(\'x\'))',0,NULL,NULL,'2026-08-01 21:03:22',0);
 /*!40000 ALTER TABLE `solutions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -505,7 +505,7 @@ CREATE TABLE `user_badges` (
   KEY `badge_id` (`badge_id`),
   CONSTRAINT `user_badges_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
   CONSTRAINT `user_badges_ibfk_2` FOREIGN KEY (`badge_id`) REFERENCES `badges` (`badge_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -647,4 +647,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-08-02  1:58:46
+-- Dump completed on 2026-08-02  2:48:33

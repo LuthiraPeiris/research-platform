@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import API_BASE_URL from "../services/api";
 
 export function AuthCallback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState("Authenticating with Google...");
+  const processedCodeRef = useRef(null);
+  const redirectTimerRef = useRef(null);
 
   useEffect(() => {
     const code = searchParams.get("code");
@@ -12,13 +15,28 @@ export function AuthCallback() {
 
     if (!code || state !== "google") {
       setStatus("Authentication code or invalid state configuration.");
-      setTimeout(() => navigate("/login"), 3000);
+      redirectTimerRef.current = setTimeout(
+        () => navigate("/login", { replace: true }),
+        3000
+      );
       return;
     }
 
+    // Google authorization codes are single-use. React Strict Mode may run
+    // this effect more than once in development, so exchange each code once.
+    if (processedCodeRef.current === code) {
+      return () => {
+        if (redirectTimerRef.current) {
+          clearTimeout(redirectTimerRef.current);
+        }
+      };
+    }
+
+    processedCodeRef.current = code;
+
     const exchangeCode = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/auth/google", {
+        const response = await fetch(`${API_BASE_URL}/auth/google`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -39,15 +57,27 @@ export function AuthCallback() {
         setStatus("Google Login successful! Redirecting...");
 
         // Redirect to main application dashboard
-        setTimeout(() => navigate("/app"), 1500);
+        redirectTimerRef.current = setTimeout(
+          () => navigate("/app", { replace: true }),
+          1500
+        );
       } catch (err) {
         console.error(err);
         setStatus(`Authentication failed: ${err.message}`);
-        setTimeout(() => navigate("/login"), 4000);
+        redirectTimerRef.current = setTimeout(
+          () => navigate("/login", { replace: true }),
+          4000
+        );
       }
     };
 
     exchangeCode();
+
+    return () => {
+      if (redirectTimerRef.current) {
+        clearTimeout(redirectTimerRef.current);
+      }
+    };
   }, [searchParams, navigate]);
 
   return (

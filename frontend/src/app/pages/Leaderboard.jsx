@@ -2,6 +2,7 @@ import { Trophy, TrendingUp, Award, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getLeaderboard } from "../services/reputationService";
 import { AppAlert } from "../components/AppAlert";
+import { API_ORIGIN } from "../services/api";
 
 export function Leaderboard() {
   const [timeframe, setTimeframe] = useState("all");
@@ -90,7 +91,7 @@ export function Leaderboard() {
     }
 
     if (imagePath.startsWith("/uploads")) {
-      return `http://localhost:5000${imagePath}`;
+      return `${API_ORIGIN}${imagePath}`;
     }
 
     return imagePath;

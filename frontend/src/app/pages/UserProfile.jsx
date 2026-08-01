@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { AppAlert } from "../components/AppAlert";
+import { API_ORIGIN } from "../services/api";
 import {
   Award,
   Calendar,
@@ -182,7 +183,7 @@ export function UserProfile() {
     }
 
     if (imagePath.startsWith("/uploads")) {
-      return `http://localhost:5000${imagePath}`;
+      return `${API_ORIGIN}${imagePath}`;
     }
 
     return imagePath;

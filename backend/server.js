@@ -2,6 +2,9 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import db from "./config/db.js";
+import path from "path";
+import { fileURLToPath } from "url";
+import { createSignedFileUrl } from "./services/s3Service.js";
 
 import authRoutes from "./routes/authRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
@@ -39,11 +42,26 @@ dotenv.config();
 })();
 
 const app = express();
+const backendDirectory = path.dirname(fileURLToPath(import.meta.url));
+const uploadsDirectory = path.join(backendDirectory, "uploads");
 
 app.use(cors());
 app.use(express.json());
 
-app.use("/uploads", express.static("uploads"));
+app.get(/^\/uploads\/s3\/(.+)$/, async (req, res) => {
+  try {
+    const objectKey = req.params[0];
+    const signedUrl = await createSignedFileUrl(objectKey);
+    res.redirect(signedUrl);
+  } catch (error) {
+    res.status(404).json({
+      message: "Profile image not found",
+      error: error.message,
+    });
+  }
+});
+
+app.use("/uploads", express.static(uploadsDirectory));
 
 // API Routes
 app.use("/api/auth", authRoutes);

@@ -20,6 +20,39 @@ const AdminComments = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        setLoading(true);
+        setComments(await getAdminComments());
+      } catch (err) {
+        setError(err.message || "Failed to load comments");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchComments();
+  }, []);
+
+  const filteredComments = comments.filter((comment) => {
+    const query = search.toLowerCase();
+    return (
+      comment.content?.toLowerCase().includes(query) ||
+      comment.author_name?.toLowerCase().includes(query) ||
+      comment.post_title?.toLowerCase().includes(query)
+    );
+  });
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
   const handleDelete = async (id, author) => {
     if (
       !window.confirm(

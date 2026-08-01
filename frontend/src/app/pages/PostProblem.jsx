@@ -179,62 +179,95 @@ const validateFiles = (selectedFiles) => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    setMessage("");
-    setError("");
+  setMessage("");
+  setError("");
 
-    if (!formData.title || !formData.description) {
-      setError("Title and description are required");
-      return;
+  const title = formData.title.trim();
+  const description = formData.description.trim();
+
+  if (!title || !description) {
+    setError("Title and description are required");
+    return;
+  }
+
+  if (!formData.field_id) {
+    setError("Please select a field");
+    return;
+  }
+
+  if (!formData.difficulty_level) {
+    setError("Please select a difficulty level");
+    return;
+  }
+
+  if (files.length > MAX_FILE_COUNT) {
+    setError(
+      `You can upload a maximum of ${MAX_FILE_COUNT} files`,
+    );
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    /*
+     * Step 1: Create the post and receive its database ID.
+     */
+    const postResponse = await createPost({
+      title,
+      description,
+      post_type: formData.post_type,
+      field_id: formData.field_id,
+      difficulty_level: formData.difficulty_level,
+    });
+
+    const postId =
+      postResponse.post_id || postResponse.postId;
+
+    if (!postId) {
+      throw new Error(
+        "The post was created, but no post ID was returned",
+      );
     }
 
-    if (!formData.field_id) {
-      setError("Please select a field");
-      return;
+    /*
+     * Step 2: Upload selected attachments to the
+     * separate attachment endpoint.
+     *
+     * uploadPostAttachments must create FormData
+     * and append every file using the field name "files".
+     */
+    if (files.length > 0) {
+      await uploadPostAttachments(postId, files);
     }
 
-    if (!formData.difficulty_level) {
-      setError("Please select a difficulty level");
-      return;
-    }
+    setMessage("Problem published successfully!");
+    setSimilarProblems([]);
 
-    setLoading(true);
+    setFormData({
+      title: "",
+      description: "",
+      field_id: "",
+      difficulty_level: "",
+      post_type: "problem",
+    });
 
-    try {
-      const postResponse = await createPost({
-        title: formData.title,
-        description: formData.description,
-        post_type: formData.post_type,
-        field_id: formData.field_id,
-        difficulty_level: formData.difficulty_level,
-      });
+    setSelectedTags([]);
+    setFiles([]);
+  } catch (err) {
+    console.error("Publish problem error:", err);
 
-      const postId = postResponse.post_id;
-
-      if (files.length > 0) {
-        await uploadPostAttachments(postId, files);
-      }
-
-      setMessage("Problem published successfully!");
-      setSimilarProblems([]);
-
-      setFormData({
-        title: "",
-        description: "",
-        field_id: "",
-        difficulty_level: "",
-        post_type: "problem",
-      });
-
-      setSelectedTags([]);
-      setFiles([]);
-    } catch (err) {
-      setError(err.message || "Failed to publish problem");
-    } finally {
-      setLoading(false);
-    }
-  };
+    setError(
+      err.response?.data?.message ||
+        err.message ||
+        "Failed to publish problem",
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="mx-auto max-w-4xl p-5 lg:p-7 text-slate-900 dark:text-slate-100">
@@ -380,7 +413,7 @@ const validateFiles = (selectedFiles) => {
               multiple
               onChange={handleFileChange}
               className="hidden"
-              accept=".pdf,.png,.jpg,.jpeg,.csv,.json,.txt,.zip"
+              accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.txt,.zip"
             />
           </label>
 

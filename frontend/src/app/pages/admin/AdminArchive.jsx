@@ -22,6 +22,21 @@ const AdminArchive = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  useEffect(() => {
+    const fetchArchive = async () => {
+      try {
+        setLoading(true);
+        setArchivedPosts(await getAdminArchive());
+      } catch (err) {
+        setError(err.message || "Failed to load archive");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArchive();
+  }, []);
+
   const handleRestore = async (id, title) => {
     if (
       !window.confirm(

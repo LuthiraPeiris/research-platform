@@ -12,6 +12,7 @@ import {
 } from "../utils/reputationUtils.js";
 
 import { createNotificationIfAllowed } from "../utils/notificationUtils.js";
+import { validateSolutionQuality } from "../services/solutionValidationService.js";
 
 const runReputationTask = async (task, context) => {
   try {
@@ -24,32 +25,70 @@ const runReputationTask = async (task, context) => {
 // ================= ADD SOLUTION =================
 
 export const addSolution = async (req, res) => {
-  const connection = await db.getConnection();
+  let connection = null;
+  let transactionCommitted = false;
   const uploadedS3Files = [];
 
   try {
-    await connection.beginTransaction();
-
     const postId = Number(req.params.postId);
     const { solution_text, content } = req.body;
 
     const finalSolutionText = solution_text || content;
 
     if (!Number.isInteger(postId) || postId <= 0) {
-      await connection.rollback();
-
       return res.status(400).json({
         message: "Invalid post ID",
       });
     }
 
     if (!finalSolutionText || finalSolutionText.trim() === "") {
-      await connection.rollback();
-
-      return res.status(400).json({
-        message: "Solution text is required",
+      return res.status(422).json({
+        code: "SOLUTION_VALIDATION_WARNING",
+        message: "Please enter a relevant solution before submitting.",
       });
     }
+
+    const [validationPosts] = await db.query(
+      `
+        SELECT
+          p.post_id,
+          p.title,
+          p.description,
+          p.difficulty_level,
+          f.field_name
+        FROM posts p
+        LEFT JOIN fields f
+          ON p.field_id = f.field_id
+        WHERE p.post_id = ?
+      `,
+      [postId],
+    );
+
+    if (validationPosts.length === 0) {
+      return res.status(404).json({
+        message: "Post not found",
+      });
+    }
+
+    const validation = await validateSolutionQuality({
+      post: validationPosts[0],
+      solutionText: finalSolutionText.trim(),
+    });
+
+    if (!validation.acceptable) {
+      return res.status(422).json({
+        code: "SOLUTION_VALIDATION_WARNING",
+        message:
+          "This solution does not appear to address the problem. Please revise it and try again.",
+        validation: {
+          reason: validation.reason,
+          suggestion: validation.suggestion,
+        },
+      });
+    }
+
+    connection = await db.getConnection();
+    await connection.beginTransaction();
 
     const [posts] = await connection.query(
       `
@@ -162,6 +201,7 @@ export const addSolution = async (req, res) => {
     }
 
     await connection.commit();
+    transactionCommitted = true;
 
     /*
      * Reputation is handled after the main transaction.
@@ -185,23 +225,27 @@ export const addSolution = async (req, res) => {
       attachments: uploadedAttachments,
     });
   } catch (error) {
-    try {
-      await connection.rollback();
-    } catch (rollbackError) {
-      console.error(
-        "Solution transaction rollback failed:",
-        rollbackError,
-      );
+    if (connection && !transactionCommitted) {
+      try {
+        await connection.rollback();
+      } catch (rollbackError) {
+        console.error(
+          "Solution transaction rollback failed:",
+          rollbackError,
+        );
+      }
     }
 
     /*
      * Remove any S3 files uploaded before the database failed.
      */
-    await Promise.allSettled(
-      uploadedS3Files.map((file) =>
-        deleteFileFromS3(file.key),
-      ),
-    );
+    if (!transactionCommitted) {
+      await Promise.allSettled(
+        uploadedS3Files.map((file) =>
+          deleteFileFromS3(file.key),
+        ),
+      );
+    }
 
     console.error("Add solution error:", error);
 
@@ -210,7 +254,7 @@ export const addSolution = async (req, res) => {
       error: error.message,
     });
   } finally {
-    connection.release();
+    connection?.release();
   }
 };
 

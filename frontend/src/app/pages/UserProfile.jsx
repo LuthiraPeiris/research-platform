@@ -185,7 +185,7 @@ export function UserProfile() {
       return `${API_ORIGIN}${imagePath}`;
     }
 
-    return imagePath;
+    return `${API_ORIGIN}/uploads/s3/${imagePath}`;
   };
 
   const defaultBadges = [

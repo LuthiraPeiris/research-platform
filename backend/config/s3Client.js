@@ -4,8 +4,6 @@ import { S3Client } from "@aws-sdk/client-s3";
 const requiredEnvironmentVariables = [
   "AWS_REGION",
   "AWS_S3_BUCKET_NAME",
-  "AWS_ACCESS_KEY_ID",
-  "AWS_SECRET_ACCESS_KEY",
 ];
 
 for (const variableName of requiredEnvironmentVariables) {

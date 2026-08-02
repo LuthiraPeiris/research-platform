@@ -100,7 +100,7 @@ export function NotificationsPage() {
       return `${API_ORIGIN}${imagePath}`;
     }
 
-    return imagePath;
+    return `${API_ORIGIN}/uploads/s3/${imagePath}`;
   };
 
   const handleOpenNotification = async (notification) => {

@@ -27,3 +27,6 @@ dist-ssr
 
 uploads
 
+researchhub.sql
+*.sql.gz
+

@@ -647,7 +647,7 @@ useEffect(() => {
             {workflow.map((step) => (
               <div
                 key={step.number}
-                className="group rounded-xl border border-slate-200 bg-white p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-900/5"
+                className="group rounded-xl border border-slate-200 bg-slate-50 p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-900/5"
               >
                 <div className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-50 text-sm font-semibold text-blue-700 transition-transform duration-300 group-hover:scale-105">
                   {step.number}

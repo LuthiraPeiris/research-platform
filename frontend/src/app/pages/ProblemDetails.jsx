@@ -603,7 +603,7 @@ const nestedComments = buildCommentTree(comments);
       return `${API_ORIGIN}${imagePath}`;
     }
 
-    return imagePath;
+    return `${API_ORIGIN}/uploads/s3/${imagePath}`;
   };
 
   if (loading) {

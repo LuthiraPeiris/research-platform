@@ -181,23 +181,33 @@ export const updateProfilePicture = async (req, res) => {
 
     const uploadedFile = await uploadFileToS3(
       req.file,
-      "profile-pictures"
+      `profile-images/user-${userId}`
     );
     uploadedS3Key = uploadedFile.key;
 
-    // Preserve the existing /uploads URL contract used throughout the UI.
-    const imagePath = `/uploads/s3/${uploadedS3Key}`;
-
+    // Store only the portable S3 object key in MySQL.
     await db.query(
       "UPDATE users SET profile_picture = ? WHERE user_id = ?",
-      [imagePath, userId]
+      [uploadedS3Key, userId]
     );
+
+    // Preserve the existing URL-shaped API response for current clients.
+    const imagePath = `/uploads/s3/${uploadedS3Key}`;
 
     const previousImagePath = users[0].profile_picture;
     const s3PathPrefix = "/uploads/s3/";
+    const previousS3Key = previousImagePath?.startsWith(s3PathPrefix)
+      ? previousImagePath.slice(s3PathPrefix.length)
+      : previousImagePath;
 
-    if (previousImagePath?.startsWith(s3PathPrefix)) {
-      const previousS3Key = previousImagePath.slice(s3PathPrefix.length);
+    const isManagedS3Image =
+      previousS3Key &&
+      !previousS3Key.startsWith("http://") &&
+      !previousS3Key.startsWith("https://") &&
+      !previousS3Key.startsWith("/uploads/") &&
+      !previousS3Key.startsWith("/");
+
+    if (isManagedS3Image) {
       deleteFileFromS3(previousS3Key).catch((error) => {
         console.error("Failed to delete previous profile picture:", error);
       });

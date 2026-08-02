@@ -27,7 +27,13 @@ const AdminLayout = () => {
       return imagePath;
     }
 
-    return `${API_BASE_URL.replace("/api", "")}${imagePath}`;
+    const apiOrigin = API_BASE_URL.replace(/\/api\/?$/, "");
+
+    if (imagePath.startsWith("/uploads")) {
+      return `${apiOrigin}${imagePath}`;
+    }
+
+    return `${apiOrigin}/uploads/s3/${imagePath}`;
   };
 
   return (

@@ -26,7 +26,7 @@ export function Leaderboard() {
       return `${API_ORIGIN}${imagePath}`;
     }
 
-    return imagePath;
+    return `${API_ORIGIN}/uploads/s3/${imagePath}`;
   };
 
   useEffect(() => {

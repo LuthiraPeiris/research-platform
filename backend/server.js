@@ -124,6 +124,25 @@ app.get("/health", (req, res) => {
   });
 });
 
+app.get("/health/database", async (req, res) => {
+  try {
+    await db.query("SELECT 1");
+
+    res.status(200).json({
+      status: "healthy",
+      database: "connected",
+    });
+  } catch (error) {
+    console.error("Database health check failed:", error);
+
+    res.status(503).json({
+      status: "unhealthy",
+      database: "disconnected",
+      message: error.message,
+    });
+  }
+});
+
 const PORT = Number(process.env.PORT) || 5000;
 
 app.listen(PORT, "0.0.0.0", () => {
